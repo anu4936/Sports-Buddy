@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel | Sports Buddy</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="form-container">
+    <h2>Admin Panel</h2>
+
+    <!-- Admin Login -->
+    <form onsubmit="adminLogin(); return false;">
+      <label for="adminPass">Admin Password</label>
+      <input type="password" id="adminPass" placeholder="Admin Password" required>
+      <button type="submit">Login</button>
+    </form>
+
+    <!-- Admin Section -->
+    <div id="adminSection" style="display:none; margin-top: 20px;">
+      <!-- Manage Categories -->
+      <h3>Manage Categories</h3>
+      <form onsubmit="addCategory(); return false;">
+        <label for="category">Category Name</label>
+        <input type="text" id="category" placeholder="Category Name" required>
+        <button type="submit">Add/Update Category</button>
+      </form>
+
+      <!-- Manage City -->
+      <h3>Manage City</h3>
+      <form onsubmit="addCity(); return false;">
+        <label for="city">City Name</label>
+        <input type="text" id="city" placeholder="City Name" required>
+        <button type="submit">Add/Update City</button>
+      </form>
+
+      <!-- Manage Area -->
+      <h3>Manage Area</h3>
+      <form onsubmit="addArea(); return false;">
+        <label for="area">Area Name</label>
+        <input type="text" id="area" placeholder="Area Name" required>
+        <button type="submit">Add/Update Area</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

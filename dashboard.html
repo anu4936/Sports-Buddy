@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Dashboard | Sports Buddy</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Welcome to Your Sports Dashboard</h2>
+    <button onclick="logoutUser()">Logout</button>
+
+    <!-- Add / Update Sports Event -->
+    <section>
+      <h3>Add / Update Sports Event</h3>
+      <form onsubmit="addSport(); return false;">
+        <input type="text" id="sportName" placeholder="e.g., Football" required>
+
+        <input type="text" id="location" placeholder="e.g., City Stadium" required>
+
+        <input type="text" id="time" placeholder="e.g., 5:00 PM" required>
+
+        <button type="submit">Add Event</button>
+      </form>
+    </section>
+
+    <!-- User Events List -->
+    <section>
+      <h3>Your Events</h3>
+      <ul id="sportsList">
+        <!-- Events will be dynamically inserted here -->
+      </ul>
+    </section>
+  </div>
+
+  <script type="module" src="app.js"></script>
+  <script>
+    // Load events when page loads
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (window.loadUserEvents) {
+          window.loadUserEvents();
+        }
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
