@@ -1,48 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>User Dashboard | Sports Buddy</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard | Sports Buddy</title>
+
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <div class="container">
-    <h2>Welcome to Your Sports Dashboard</h2>
-    <button onclick="logoutUser()">Logout</button>
 
-    <!-- Add / Update Sports Event -->
-    <section>
-      <h3>Add / Update Sports Event</h3>
-      <form onsubmit="addSport(); return false;">
-        <input type="text" id="sportName" placeholder="e.g., Football" required>
+    <div class="container">
 
-        <input type="text" id="location" placeholder="e.g., City Stadium" required>
+        <h2>Welcome to Your Sports Dashboard</h2>
 
-        <input type="text" id="time" placeholder="e.g., 5:00 PM" required>
+        <button onclick="logoutUser()">Logout</button>
 
-        <button type="submit">Add Event</button>
-      </form>
-    </section>
 
-    <!-- User Events List -->
-    <section>
-      <h3>Your Events</h3>
-      <ul id="sportsList">
-        <!-- Events will be dynamically inserted here -->
-      </ul>
-    </section>
-  </div>
+        <!-- Add Sports Event -->
 
-  <script type="module" src="app.js"></script>
-  <script>
-    // Load events when page loads
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        if (window.loadUserEvents) {
-          window.loadUserEvents();
-        }
-      }, 1000);
-    });
-  </script>
+        <section>
+
+            <h3>Add / Update Sports Event</h3>
+
+
+            <form id="sportForm">
+
+
+                <input 
+                    type="text" 
+                    id="sportName" 
+                    placeholder="Enter Sport Name"
+                    required
+                >
+
+
+                <input 
+                    type="text" 
+                    id="location" 
+                    placeholder="Enter Location"
+                    required
+                >
+
+
+                <input 
+                    type="text" 
+                    id="time" 
+                    placeholder="Enter Time"
+                    required
+                >
+
+
+                <button type="submit">
+                    Add Event
+                </button>
+
+
+            </form>
+
+
+        </section>
+
+
+
+        <!-- Display Events -->
+
+        <section>
+
+            <h3>Your Events</h3>
+
+
+            <ul id="sportsList">
+
+                <!-- Firebase events will display here -->
+
+            </ul>
+
+
+        </section>
+
+
+    </div>
+
+
+
+    <script type="module" src="app.js"></script>
+
+
 </body>
+
 </html>
