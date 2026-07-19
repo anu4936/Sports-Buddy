@@ -1,191 +1,657 @@
+// Firebase Imports
+import { initializeApp } from 
+'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
 
-// Import Firebase modules from CDN
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
-import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
-import { getDatabase, ref, push, set, onValue } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
-import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from 
+'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
 
-// Your web app's Firebase configuration
+
+import {
+  getDatabase,
+  ref,
+  push,
+  set,
+  update,
+  onValue
+} from 
+'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
+
+
+import { getAnalytics } from 
+'https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js';
+
+
+// Firebase Configuration
+
 const firebaseConfig = {
+
   apiKey: "AIzaSyAa08-pQi7_xLbeHcG9ga3j5QmkKEVqoT8",
+
   authDomain: "sports-buddy-89097.firebaseapp.com",
+
   projectId: "sports-buddy-89097",
+
   storageBucket: "sports-buddy-89097.appspot.com",
+
   messagingSenderId: "730114483301",
+
   appId: "1:730114483301:web:75f5f059981f8afcb7528c",
+
   measurementId: "G-60SS3GWFPN",
-  databaseURL: "https://sports-buddy-89097-default-rtdb.asia-southeast1.firebasedatabase.app"
+
+  databaseURL:
+  "https://sports-buddy-89097-default-rtdb.asia-southeast1.firebasedatabase.app"
+
 };
 
+
 // Initialize Firebase
+
 const app = initializeApp(firebaseConfig);
+
 const auth = getAuth(app);
-const db = getFirestore(app);
+
 const rtdb = getDatabase(app);
+
 const analytics = getAnalytics(app);
 
-// Load events when user is authenticated
-onAuthStateChanged(auth, (user) => {
-  if (user && window.location.pathname.includes('dashboard.html')) {
-    loadUserEvents();
-  }
+
+
+// Global Functions
+
+window.registerUser = registerUser;
+
+window.loginUser = loginUser;
+
+window.logoutUser = logoutUser;
+
+window.addSport = addSport;
+
+window.editEvent = editEvent;
+
+window.adminLogin = adminLogin;
+
+window.addCategory = addCategory;
+
+window.addCity = addCity;
+
+window.addArea = addArea;
+
+
+
+// Check Login User
+
+onAuthStateChanged(auth,(user)=>{
+
+    if(user && window.location.pathname.includes("dashboard.html")){
+
+        loadUserEvents();
+
+    }
+
 });
 
-// Make functions globally accessible
-window.registerUser = registerUser;
-window.loginUser = loginUser;
-window.logoutUser = logoutUser;
-window.addSport = addSport;
-window.adminLogin = adminLogin;
-window.addCategory = addCategory;
-window.addCity = addCity;
-window.addArea = addArea;
-window.loadUserEvents = loadUserEvents;
 
-// USER REGISTER
-function registerUser() {
-  const email = document.getElementById('regEmail').value.trim();
-  const password = document.getElementById('regPassword').value.trim();
 
-  console.log('Attempting registration for:', email);
-  createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
+// ================= USER REGISTER =================
 
-      // Save user info to Database
-      setDoc(doc(db, 'users', user.uid), {
-        email: user.email,
-        createdAt: new Date().toISOString()
-      }).then(() => {
-        console.log("User data saved to Firestore successfully");
-        alert("Registration successful!");
-        window.location.href = "login.html";
-      }).catch(err => {
-        console.error("Firestore save error:", err);
-        alert("Registration successful but failed to save user data: " + err.message);
-      });
-    })
-    .catch(err => alert(err.message));
-}
 
-// USER LOGIN
-function loginUser() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value.trim();
+function registerUser(){
 
-  console.log('Attempting login for:', email);
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      console.log('Login successful for user:', userCredential.user.email);
-      window.location.href = "dashboard.html";
-    })
-    .catch(err => {
-      console.error('Login error:', err);
-      alert(err.message);
-    });
-}
+    const name =
+    document.getElementById("regName").value.trim();
 
-// LOGOUT
-function logoutUser() {
-  signOut(auth)
-    .then(() => {
-      window.location.href = "index.html";
-    })
-    .catch(err => alert("Error logging out: " + err.message));
-}
+    const email =
+    document.getElementById("regEmail").value.trim();
 
-// ADD SPORT
-function addSport() {
-  const sportName = document.getElementById('sportName').value.trim();
-  const location = document.getElementById('location').value.trim();
-  const time = document.getElementById('time').value.trim();
-  const user = auth.currentUser;
+    const password =
+    document.getElementById("regPassword").value.trim();
 
-  console.log('Current user:', user);
-  console.log('Adding sport:', { sportName, location, time });
+    const city =
+    document.getElementById("regCity").value.trim();
 
-  if (user) {
-    const sportRef = push(ref(rtdb, 'sports/' + user.uid));
-    set(sportRef, { sportName, location, time, createdBy: user.email })
-      .then(() => {
-        console.log("Sport event saved to Realtime DB successfully");
-        alert("Sport event added!");
-        document.getElementById('sportName').value = '';
-        document.getElementById('location').value = '';
-        document.getElementById('time').value = '';
-        loadUserEvents(); // Refresh the events list
-      })
-      .catch(err => {
-        console.error("Realtime DB save error:", err);
-        alert("Failed to add sport event: " + err.message);
-      });
-  } else {
-    alert("Please login first.");
-  }
-}
+    const phone =
+    document.getElementById("regPhone").value.trim();
 
-// ADMIN LOGIN
-function adminLogin() {
-  const pass = document.getElementById('adminPass').value;
-  if (pass === "admin123") {
-    document.getElementById('adminSection').style.display = 'block';
-  } else {
-    alert("Invalid Admin Password!");
-  }
-}
 
-// ADMIN ADD FUNCTIONS
-function addCategory() {
-  const category = document.getElementById('category').value.trim();
-  const categoryRef = push(ref(rtdb, 'categories'));
-  set(categoryRef, { category })
-    .then(() => alert("Category added!"))
-    .catch(err => alert("Failed to add category: " + err.message));
-}
 
-function addCity() {
-  const city = document.getElementById('city').value.trim();
-  const cityRef = push(ref(rtdb, 'cities'));
-  set(cityRef, { city })
-    .then(() => alert("City added!"))
-    .catch(err => alert("Failed to add city: " + err.message));
-}
+    createUserWithEmailAndPassword(auth,email,password)
 
-function addArea() {
-  const area = document.getElementById('area').value.trim();
-  const areaRef = push(ref(rtdb, 'areas'));
-  set(areaRef, { area })
-    .then(() => alert("Area added!"))
-    .catch(err => alert("Failed to add area: " + err.message));
-}
+    .then((userCredential)=>{
 
-// LOAD USER EVENTS
-function loadUserEvents() {
-  const user = auth.currentUser;
-  if (user) {
-    const eventsRef = ref(rtdb, 'sports/' + user.uid);
-    onValue(eventsRef, (snapshot) => {
-      const eventsList = document.getElementById('sportsList');
-      eventsList.innerHTML = '';
-      
-      if (snapshot.exists()) {
-        const events = snapshot.val();
-        Object.keys(events).forEach(key => {
-          const event = events[key];
-          const li = document.createElement('li');
-          li.innerHTML = `
-            <strong>${event.sportName}</strong><br>
-            📍 Location: ${event.location}<br>
-            ⏰ Time: ${event.time}<br>
-            <small>Created by: ${event.createdBy}</small>
-          `;
-          li.style.cssText = 'margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px;';
-          eventsList.appendChild(li);
+
+        const user = userCredential.user;
+
+
+        set(ref(rtdb,"users/"+user.uid),{
+
+            uid:user.uid,
+
+            name:name,
+
+            email:email,
+
+            city:city,
+
+            phone:phone,
+
+            createdAt:new Date().toISOString()
+
         });
-      } else {
-        eventsList.innerHTML = '<li>No events added yet.</li>';
-      }
+
+
+        alert("Registration Successful!");
+
+        window.location.href="login.html";
+
+
+    })
+
+    .catch(error=>{
+
+        alert(error.message);
+
     });
-  }
+
+
 }
+
+
+
+
+// ================= LOGIN =================
+
+
+function loginUser(){
+
+
+    const email =
+    document.getElementById("loginEmail").value.trim();
+
+
+    const password =
+    document.getElementById("loginPassword").value.trim();
+
+
+
+    signInWithEmailAndPassword(auth,email,password)
+
+    .then(()=>{
+
+
+        window.location.href="dashboard.html";
+
+
+    })
+
+    .catch(error=>{
+
+        alert(error.message);
+
+    });
+
+
+}
+
+
+
+
+
+// ================= LOGOUT =================
+
+
+function logoutUser(){
+
+
+    signOut(auth)
+
+    .then(()=>{
+
+        window.location.href="index.html";
+
+    })
+
+    .catch(error=>{
+
+        alert(error.message);
+
+    });
+
+
+}
+
+
+
+
+// ================= ADD SPORTS EVENT =================
+
+
+function addSport(){
+
+
+    const sportName =
+    document.getElementById("sportName").value.trim();
+
+
+    const location =
+    document.getElementById("location").value.trim();
+
+
+    const time =
+    document.getElementById("time").value.trim();
+
+
+
+    const user = auth.currentUser;
+
+
+    if(!user){
+
+        alert("Please Login First");
+
+        return;
+
+    }
+
+
+
+    const eventRef =
+    push(ref(rtdb,"sports/"+user.uid));
+
+
+
+    set(eventRef,{
+
+        sportName:sportName,
+
+        location:location,
+
+        time:time,
+
+        createdBy:user.email
+
+    })
+
+    .then(()=>{
+
+
+        alert("Sport Event Added Successfully!");
+
+
+    })
+
+    .catch(error=>{
+
+        alert(error.message);
+
+    });
+
+
+}
+
+
+
+
+
+
+// ================= DISPLAY EVENTS =================
+
+
+function loadUserEvents(){
+
+
+const user = auth.currentUser;
+
+
+if(!user)return;
+
+
+
+const sportsRef =
+ref(rtdb,"sports/"+user.uid);
+
+
+
+onValue(sportsRef,(snapshot)=>{
+
+
+const list =
+document.getElementById("sportsList");
+
+
+if(!list)return;
+
+
+
+list.innerHTML="";
+
+
+
+snapshot.forEach((child)=>{
+
+
+const sport = child.val();
+
+
+
+const li=document.createElement("li");
+
+
+
+li.innerHTML=`
+
+<b>${sport.sportName}</b><br>
+
+Location: ${sport.location}<br>
+
+Time: ${sport.time}<br>
+
+
+<button onclick="editEvent(
+'${child.key}',
+'${sport.sportName}',
+'${sport.location}',
+'${sport.time}'
+)">
+
+Update
+
+</button>
+
+`;
+
+
+
+list.appendChild(li);
+
+
+
+});
+
+
+});
+
+
+}
+
+
+
+
+
+
+
+// ================= UPDATE EVENT =================
+
+
+function editEvent(id,oldSport,oldLocation,oldTime){
+
+
+const newSport =
+prompt("Enter sport name",oldSport);
+
+
+
+const newLocation =
+prompt("Enter location",oldLocation);
+
+
+
+const newTime =
+prompt("Enter time",oldTime);
+
+
+
+const user=auth.currentUser;
+
+
+
+update(
+
+ref(rtdb,"sports/"+user.uid+"/"+id),
+
+{
+
+sportName:newSport,
+
+location:newLocation,
+
+time:newTime
+
+}
+
+)
+
+.then(()=>{
+
+alert("Event Updated Successfully!");
+
+})
+
+
+.catch(error=>{
+
+alert(error.message);
+
+});
+
+
+}
+
+
+
+
+
+
+
+// ================= ADMIN LOGIN =================
+
+
+function adminLogin(){
+
+
+const pass =
+document.getElementById("adminPass").value;
+
+
+
+if(pass==="admin123"){
+
+
+document.getElementById("adminSection").style.display="block";
+
+
+}
+
+else{
+
+
+alert("Invalid Admin Password");
+
+
+}
+
+
+}
+
+
+
+
+
+
+// ================= ADD CATEGORY =================
+
+
+function addCategory(){
+
+
+const category =
+document.getElementById("category").value.trim();
+
+
+
+if(category===""){
+
+alert("Enter Category");
+
+return;
+
+}
+
+
+
+const categoryRef =
+push(ref(rtdb,"categories"));
+
+
+
+set(categoryRef,{
+
+categoryName:category,
+
+createdAt:new Date().toISOString()
+
+})
+
+.then(()=>{
+
+alert("Category Added Successfully!");
+
+});
+
+}
+
+
+
+
+
+
+// ================= ADD CITY =================
+
+
+function addCity(){
+
+
+const city =
+document.getElementById("city").value.trim();
+
+
+
+if(city===""){
+
+alert("Enter City");
+
+return;
+
+}
+
+
+
+const cityRef =
+push(ref(rtdb,"cities"));
+
+
+
+set(cityRef,{
+
+cityName:city,
+
+createdAt:new Date().toISOString()
+
+})
+
+.then(()=>{
+
+alert("City Added Successfully!");
+
+});
+
+}
+
+
+
+
+
+
+// ================= ADD AREA =================
+
+
+function addArea(){
+
+
+const area =
+document.getElementById("area").value.trim();
+
+
+
+if(area===""){
+
+alert("Enter Area");
+
+return;
+
+}
+
+
+
+const areaRef =
+push(ref(rtdb,"areas"));
+
+
+
+set(areaRef,{
+
+areaName:area,
+
+createdAt:new Date().toISOString()
+
+})
+
+.then(()=>{
+
+alert("Area Added Successfully!");
+
+});
+
+
+}
+
+
+
+
+
+
+// Dashboard Form Submit
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+
+const form =
+document.getElementById("sportForm");
+
+
+
+if(form){
+
+
+form.addEventListener("submit",(e)=>{
+
+
+e.preventDefault();
+
+
+addSport();
+
+
+});
+
+
+}
+
+
+});
