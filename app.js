@@ -37,7 +37,7 @@ const firebaseConfig = {
 
   projectId: "sports-buddy-89097",
 
-  storageBucket: "sports-buddy-89097.appspot.com",
+storageBucket: "sports-buddy-89097.firebasestorage.app",
 
   messagingSenderId: "730114483301",
 
@@ -100,109 +100,42 @@ onAuthStateChanged(auth,(user)=>{
 
 
 // ================= USER REGISTER =================
+async function registerUser() {
 
+    const email = document.getElementById("regEmail").value.trim();
+    const password = document.getElementById("regPassword").value.trim();
 
-function registerUser(){
-
-    const name =
-    document.getElementById("regName").value.trim();
-
-    const email =
-    document.getElementById("regEmail").value.trim();
-
-    const password =
-    document.getElementById("regPassword").value.trim();
-
-    const city =
-    document.getElementById("regCity").value.trim();
-
-    const phone =
-    document.getElementById("regPhone").value.trim();
-
-
-
-    createUserWithEmailAndPassword(auth,email,password)
-
-    .then((userCredential)=>{
-
-
-        const user = userCredential.user;
-
-
-        set(ref(rtdb,"users/"+user.uid),{
-
-            uid:user.uid,
-
-            name:name,
-
-            email:email,
-
-            city:city,
-
-            phone:phone,
-
-            createdAt:new Date().toISOString()
-
-        });
-
+    try {
+        await createUserWithEmailAndPassword(auth, email, password);
 
         alert("Registration Successful!");
+        window.location.href = "login.html";
 
-        window.location.href="login.html";
-
-
-    })
-
-    .catch(error=>{
-
-        alert(error.message);
-
-    });
-
-
+    } catch (error) {
+        alert(error.code + "\n" + error.message);
+    }
 }
 
+async function loginUser() {
 
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
 
+    try {
 
-// ================= LOGIN =================
+        await signInWithEmailAndPassword(auth, email, password);
 
+        alert("Login Successful!");
+        window.location.href = "dashboard.html";
 
-function loginUser(){
+    } catch (error) {
 
+        console.log(error.code);
+        console.log(error.message);
 
-    const email =
-    document.getElementById("loginEmail").value.trim();
-
-
-    const password =
-    document.getElementById("loginPassword").value.trim();
-
-
-
-    signInWithEmailAndPassword(auth,email,password)
-
-    .then(()=>{
-
-
-        window.location.href="dashboard.html";
-
-
-    })
-
-    .catch(error=>{
-
-        alert(error.message);
-
-    });
-
-
+        alert(error.code + "\n" + error.message);
+    }
 }
-
-
-
-
-
 // ================= LOGOUT =================
 
 
